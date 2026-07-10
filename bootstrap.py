@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import json
 import subprocess
 import sys
 from argparse import ArgumentParser
@@ -34,9 +33,14 @@ def main():
         type=Path,
         help="Local branch to check mgr out into",
     )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Continue without asking for confirmation",
+    )
     args = parser.parse_args()
 
-    home: Path = args.home
+    home: Path = args.home.resolve()
     mgr_repo: str = args.mgr_repo
     mgr_path: Path | None = args.mgr_path
     dotfiles_repo: str = args.dotfiles_repo
@@ -54,18 +58,21 @@ def main():
         print("Set up your git keys for github first")
         sys.exit(1)
 
-    # Prepare dotfiles dir
-    dotfiles_cfg_path = home / ".dotfiles"
-    dotfiles_cfg_path.mkdir(exist_ok=True)
-
     # Check out and update mgr repo
     if not mgr_path:
-        mgr_path = dotfiles_cfg_path / "mgr_repo"
+        mgr_path = home / ".dotfiles" / "mgr_repo"
     mgr_path = mgr_path.resolve()
 
-    print("(Re)using the git checkout of the dotfile manager at:")
-    print(mgr_path)
-    input("Continue?")
+    print("Boostrap config:")
+    print(f"  Target HOME dir:      {home}")
+    print(f"  Mgr checkout path:    {mgr_path}")
+    print(f"  Mgr repo URL:         {mgr_repo}")
+    print(f"  Dotfiles repo URL:    {dotfiles_repo}")
+    print(f"  Dotfiles repo branch: {dotfiles_branch or '<default>'}")
+    print()
+
+    if not args.yes:
+        input("Continue?")
 
     if not mgr_path.exists():
         print("Create initial clone of mgr...")
@@ -83,12 +90,20 @@ def main():
         cwd=mgr_path,
     )
 
-    # Store config and continue next bootstrap phase
-    bootstrap_json = {
-        "mgr_checkout": str(mgr_path),
-    }
-    (dotfiles_cfg_path / "bootstrap.json").write_text(
-        json.dumps(bootstrap_json, indent=4)
+    # Run updater from repo
+    update_cmd = [
+        sys.executable,
+        mgr_path / "update_mgr.py",
+        "--home",
+        str(home),
+        "--dotfiles-repo",
+        str(dotfiles_repo),
+    ]
+    if dotfiles_branch:
+        update_cmd += ["--dotfiles-branch", dotfiles_branch]
+    subprocess.run(
+        update_cmd,
+        check=True,
     )
 
 

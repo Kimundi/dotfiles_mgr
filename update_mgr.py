@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -26,6 +27,18 @@ def main():
     home: Path = args.home
     dotfiles_repo: str = args.dotfiles_repo
     dotfiles_branch: str | None = args.dotfiles_branch
+
+    # Prepare dotfiles dir
+    dotfiles_cfg_path = home / ".dotfiles"
+    dotfiles_cfg_path.mkdir(exist_ok=True)
+
+    # Store config and continue next bootstrap phase
+    bootstrap_json = {
+        "mgr_checkout": str(Path(__file__).parent.resolve()),
+    }
+    (dotfiles_cfg_path / "bootstrap.json").write_text(
+        json.dumps(bootstrap_json, indent=4)
+    )
 
 
 if __name__ == "__main__":
