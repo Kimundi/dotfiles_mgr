@@ -5,6 +5,8 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
+DOTFILES_DIR = ".dotfiles2"
+
 
 def main():
     parser = ArgumentParser()
@@ -60,7 +62,7 @@ def main():
 
     # Check out and update mgr repo
     if not mgr_path:
-        mgr_path = home / ".dotfiles" / "mgr_repo"
+        mgr_path = home / DOTFILES_DIR / "mgr_repo"
     mgr_path = mgr_path.resolve()
 
     print("Boostrap config:")
