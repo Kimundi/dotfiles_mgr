@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import json
 import shlex
 import subprocess
 from argparse import ArgumentParser
@@ -38,14 +37,6 @@ def main():
     # Prepare dotfiles dir
     dotfiles_cfg_path = home / DOTFILES_DIR
     dotfiles_cfg_path.mkdir(exist_ok=True)
-
-    # Store config and continue next bootstrap phase
-    bootstrap_json = {
-        "mgr_checkout": str(Path(__file__).parent.resolve()),
-    }
-    (dotfiles_cfg_path / "bootstrap.json").write_text(
-        json.dumps(bootstrap_json, indent=4)
-    )
 
     dotfiles_git_dir = dotfiles_cfg_path / "dotfiles_git_dir"
 

@@ -1,8 +1,10 @@
 # Usage
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/Kimundi/dotfiles_mgr/main/bootstrap.py | python3 - \
+curl https://raw.githubusercontent.com/Kimundi/dotfiles_mgr/main/bootstrap.py -o bootstrap_dotfiles.py \
+    && python3 bootstrap_dotfiles.py \
     --mgr-repo "git@github.com:Kimundi/dotfiles_mgr.git" \
     --dotfiles-repo "git@github.com:Kimundi/dotfiles2.git" \
-    --home ~
+    --home ~ \
+    && rm bootstrap_dotfiles.py
 ```
